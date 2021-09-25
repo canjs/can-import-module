@@ -4,8 +4,7 @@ var getGlobal = require("can-globals/global/global");
 var namespace = require("can-namespace");
 
 /**
- * @module {function} can-util/js/import/import import
- * @parent can-util/js
+ * @module module:can-import-module
  * @signature `importModule(moduleName, parentName)`
  * @hide
  *
@@ -36,14 +35,16 @@ module.exports = namespace.import = function(moduleName, parentName) {
 				});
 			} else if(global.require){
 				resolve(global.require(moduleName));
-			} else {
+			} else if(typeof stealRequire !== "undefined"){
 				// steal optimized build
-				if (typeof stealRequire !== "undefined") {
-					steal.import(moduleName, { name: parentName }).then(resolve, reject);
-				} else {
-					// ideally this will use can.getObject
-					resolve();
-				}
+				steal.import(moduleName, { name: parentName }).then(resolve, reject);
+			} else if("noModule" in HTMLScriptElement.prototype){
+				if(!(moduleName.match(/[^\\\/]\.([^.\\\/]+)$/) || [null]).pop()){
+					moduleName += '.js';
+				} 
+				import(moduleName).then(resolve, reject);
+			}else{
+				reject("no proper module-loader available");
 			}
 		} catch(err) {
 			reject(err);
