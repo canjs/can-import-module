@@ -1,1 +1,1 @@
-import './can-import-module-test';
+import './test/browser-test';

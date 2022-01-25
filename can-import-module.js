@@ -1,6 +1,5 @@
 'use strict';
 
-var getGlobal = require("can-globals/global/global");
 var namespace = require("can-namespace");
 
 /**
@@ -22,35 +21,86 @@ var namespace = require("can-namespace");
  * @return {Promise} A Promise that will resolve when the module has been imported.
  */
 
+// array of loader functions, last in first out
+var loader = [];
+
+/**
+ * add a loader-function to the list of loader
+ * the function should return a promise that resolves when the module has been loaded
+ * otherwise the loader function should return null or undefined
+ * 
+ * @signature `import.addLoader(loader)`
+ * @param fn callable
+ */
+function addLoader(fn){
+	if(typeof fn === "function"){
+		loader.push(fn);
+	}
+}
+
+/**
+ * clear the list of loaders
+ */
+function flushLoader(){
+	loader = [];
+}
+
+/**
+ * a bunch of presets that can be used in a certain environment 
+ * 
+ * @param preset string
+ */
+function preset(preset){
+	flushLoader();
+	
+	switch (preset){
+		case "stealjs":
+			addLoader(require("./loader/steal-optimized"));
+			addLoader(require("./loader/system"));
+			break;
+		case "ES2020":
+		case "dynamic-import":
+			addLoader(require("./loader/es6"));
+			break;
+		case "node":
+			addLoader(require("./loader/node"));
+			break;
+		case "all":
+		default:
+			addLoader(require("./loader/steal-optimized"));
+			addLoader(require("./loader/es6"));
+			addLoader(require("./loader/node"));
+			addLoader(require("./loader/require"));
+			addLoader(require("./loader/system"));
+			break;
+	}
+}
+
+// by default, add all available loaders to the list
+preset('all');
+
 module.exports = namespace.import = function(moduleName, parentName) {
 	return new Promise(function(resolve, reject) {
 		try {
-			var global = getGlobal();
-			if(typeof global.System === "object" && isFunction(global.System["import"])) {
-				global.System["import"](moduleName, {
-					name: parentName
-				}).then(resolve, reject);
-			} else if(global.define && global.define.amd){
-				global.require([moduleName], function(value){
-					resolve(value);
-				});
-			} else if(global.require){
-				resolve(global.require(moduleName));
-			} else {
-				// steal optimized build
-				if (typeof stealRequire !== "undefined") {
-					steal.import(moduleName, { name: parentName }).then(resolve, reject);
-				} else {
-					// ideally this will use can.getObject
-					resolve();
+			var loaderPromise;
+			// last added loader will be called first
+			for (var i = loader.length - 1; i >= 0; i--) {
+				loaderPromise = loader[i](moduleName, parentName);
+				if (loaderPromise) {
+					break;
 				}
+			}
+
+			if(loaderPromise){
+				loaderPromise.then(resolve, reject);
+			}else{
+				reject("no proper module-loader available");
 			}
 		} catch(err) {
 			reject(err);
 		}
 	});
 };
-
-function isFunction(fn) {
-	return typeof fn === "function";
-}
+module.exports.addLoader = addLoader;
+module.exports.flushLoader = flushLoader;
+module.exports.preset = preset;
