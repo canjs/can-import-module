@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = 'Hello world';
+module.exports = 'Hello from cjs-module';

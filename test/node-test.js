@@ -17,7 +17,7 @@ describe('nodeJS', function (){
 	it('loads fake module', function() {
 		load.addLoader(require('../loader/node'));
 		return load('can-import-module-test/cjs-module').then(function(module) {
-			assert.equal(module, 'Hello world');
+			assert.equal(module, 'Hello from cjs-module');
 		}).then(null, function(err){
 			assert.fail(err);
 		});
