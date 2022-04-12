@@ -15,7 +15,7 @@
   "scripts": {
     "preversion": "npm test",
     "postpublish": "git push --tags && git push",
-    "testee": "testee test.html --browsers firefox",
+    "testee": "DEBUG=testee:* testee test.html --browsers firefox",
     "mocha": "mocha -- test/node-test.js",
     "test": "npm run jshint && npm run mocha && npm run testee",
     "jshint": "jshint ./*.js --config",
