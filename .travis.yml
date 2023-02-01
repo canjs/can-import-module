@@ -2,6 +2,6 @@ language: node_js
 node_js: node
 addons:
   firefox: latest
-dist: xenial
+dist: focal
 services:
   - xvfb

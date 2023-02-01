@@ -59,6 +59,7 @@ function preset(preset){
 			addLoader(require("./loader/system"));
 			break;
 		case "ES2020":
+		case "es2020":
 		case "dynamic-import":
 			addLoader(require("./loader/es6"));
 			break;

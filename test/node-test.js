@@ -23,3 +23,19 @@ describe('nodeJS', function (){
 		});
 	});
 });
+
+describe('es6 module', function() {
+	it('does not syntax error when trying to import in es6 style', function() {
+		load.flushLoader();
+		load.addLoader(require('../loader/es6'));
+		return load('/test/es6-module').then(function(result) {
+			assert.fail("es6 loader did not reject when expected");
+		}, function(err) {
+			assert.equal(
+				err,
+				'no proper module-loader available',
+				'Incorrect error message returned from import attempt: ' + err
+			);
+		});
+	});
+});
