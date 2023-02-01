@@ -8,10 +8,7 @@ function ignorer(path) {
 
 stealTools.export({
 	steal: {
-		config: __dirname + "/package.json!npm",
-    paths: {
-      "can-import-module/loader/es6.js": "compat-loader/es6.js"
-    }
+		config: __dirname + "/package.json!npm"
 	},
 	outputs: {
 		"+bundled-cjs": {
