@@ -25,16 +25,16 @@ describe('nodeJS', function (){
 });
 
 describe('es6 module', function() {
-	it('throws an error when trying to import in es6 style', function() {
+	it('does not syntax error when trying to import in es6 style', function() {
 		load.flushLoader();
 		load.addLoader(require('../loader/es6'));
-		return load('/test/es6-module').then(function() {
-			assert.fail("es6 loader did not throw error when expected");
+		return load('/test/es6-module').then(function(result) {
+			assert.fail("es6 loader did not reject when expected");
 		}, function(err) {
 			assert.equal(
-				err.message,
-				'ES dynamic imports are not available on this platform',
-				'Correct error message returned from import attempt'
+				err,
+				'no proper module-loader available',
+				'Incorrect error message returned from import attempt: ' + err
 			);
 		});
 	});
