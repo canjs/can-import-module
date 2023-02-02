@@ -1,5 +1,5 @@
 var QUnit = require('steal-qunit');
-var moduleImport = require( '../can-import-module');
+var moduleImport = require('../can-import-module');
 
 var prefix;
 QUnit.module('can-import-module', {
@@ -16,7 +16,7 @@ QUnit.module('can-import-module', {
 			};
 		}
 	}
-})
+});
 
 QUnit.test('load npm library via default config (SystemJS first)', function(assert) {
 	return moduleImport('can-import-module/test/cjs-module').then(function(data) {
